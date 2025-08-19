@@ -17,14 +17,17 @@ pipeline {
         stage('Build Backend') {
             steps {
                 echo "Building Spring Boot backend..."
-                sh './mvnw clean package -DskipTests'
+                dir('Generator') {
+                    sh 'chmod +x mvnw'        // s’assure que le wrapper Maven est exécutable
+                    sh './mvnw clean package -DskipTests'
+                }
             }
         }
 
         stage('Build Frontend') {
             steps {
                 echo "Building Angular frontend..."
-                dir('frontend') {
+                dir('Generator(Angular)') {
                     sh 'npm install'
                     sh 'npm run build -- --output-path=dist'
                 }
@@ -34,8 +37,8 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 echo "Building Docker images..."
-                sh "docker build -t ${BACKEND_IMAGE} ./backend"
-                sh "docker build -t ${FRONTEND_IMAGE} ./frontend"
+                sh "docker build -t ${BACKEND_IMAGE} ./Generator"
+                sh "docker build -t ${FRONTEND_IMAGE} ./Generator(Angular)"
             }
         }
 
