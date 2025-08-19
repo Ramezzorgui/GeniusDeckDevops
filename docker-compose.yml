@@ -5,7 +5,7 @@ services:
     image: geniusdeck-backend:latest
     container_name: geniusdeck-backend
     ports:
-      - "8081:8081"
+      - "8083:8081"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/presentation
       - SPRING_DATASOURCE_USERNAME=postgres
