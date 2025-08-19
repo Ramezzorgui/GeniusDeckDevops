@@ -39,7 +39,7 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 echo "Building Docker images..."
-                sh "docker build -t ${BACKEND_IMAGE} ./Generator"
+                sh "docker build -t ${BACKEND_IMAGE} ./generator"
                 sh "docker build -t ${FRONTEND_IMAGE} ./Generator(Angular)"
             }
         }
