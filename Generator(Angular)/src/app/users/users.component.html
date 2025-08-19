@@ -1,0 +1,72 @@
+<div class="dashboard-layout d-flex">
+  <sidebar></sidebar>
+
+  <div class="container mt-4">
+    <h2 class="page-title">Liste des utilisateurs</h2>
+
+    <div *ngIf="loading" class="loading-spinner">Chargement...</div>
+    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+    <div class="table-responsive">
+      <table *ngIf="!loading && !error" class="table custom-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Date de création</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="badge"
+                    [ngClass]="{
+                      'badge-admin': user.role === 'admin',
+                      'badge-user': user.role === 'user',
+                      'badge-other': user.role !== 'admin' && user.role !== 'user'
+                    }">
+                {{ user.role }}
+              </span>
+            </td>
+            <td>{{ user.createdAt | date:'short' }}</td>
+            <td>
+              <a
+                class="btn btn-sm btn-edit"
+                [routerLink]="['/users/edit', user.id]"
+              >
+                <i class="fas fa-edit"></i> Modifier
+              </a>
+
+               <button
+    *ngIf="!user.blocked"
+    class="btn btn-sm ms-2 text-white"
+    style="background-color: #6b7280; border-color: #6b7280;"
+    (click)="blockUser(user.id)"
+  >
+    <i class="fas fa-ban"></i> Bloquer
+  </button>
+
+  <button
+    *ngIf="user.blocked"
+    class="btn btn-sm ms-2 text-white"
+    style="background-color: #6b7280; border-color: #6b7280;"
+    (click)="unblockUser(user.id)"
+  >
+    <i class="fas fa-unlock"></i> Débloquer
+  </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Ajouter dans <head> si ce n'est pas fait -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->

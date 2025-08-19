@@ -1,0 +1,33 @@
+<nav [ngClass]="isHomePage() ? 'top-navbar home-navbar' : 'top-navbar'">
+  <div class="navbar-left">
+    <a class="navbar-brand" routerLink="/">GeniusDeck</a>
+  </div>
+
+  <div class="navbar-right">
+    <!-- Non connecté -->
+    <div *ngIf="!isLoggedIn" class="auth-links">
+  <a routerLink="/login" [ngClass]="!isHomePage() ? 'dark-text' : ''">Connexion</a>
+  <a routerLink="/register"
+     class="btn-primary"
+     [ngClass]="!isHomePage() ? 'dark-btn-text' : ''">registre</a>
+</div>
+
+    <!-- Connecté -->
+    <div *ngIf="isLoggedIn" class="user-info">
+      <a [routerLink]="getProfileRoute()"
+         class="profile-link"
+         [ngClass]="!isHomePage() ? 'dark-text' : ''">
+        {{ username }}
+      </a>
+      <a (click)="logout()"
+         class="logout-link"
+         [ngClass]="!isHomePage() ? 'dark-text' : ''">
+        Logout
+      </a>
+    </div>
+  </div>
+</nav>
+
+<main class="page-content">
+  <router-outlet></router-outlet>
+</main>

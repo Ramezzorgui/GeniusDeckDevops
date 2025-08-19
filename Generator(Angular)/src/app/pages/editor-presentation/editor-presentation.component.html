@@ -1,0 +1,147 @@
+<div class="editor-container">
+  <!-- Barre d'action du haut -->
+  <header class="editor-header">
+    <button class="btn" (click)="savePresentation()">💾 Sauvegarder</button>
+      <div class="dropdown">
+  <button class="btn">📤 Exporter ▼</button>
+  <div class="dropdown-content">
+    <a (click)="exportAsPDF()">
+      <i class="fas fa-file-pdf"></i> Exporter en PDF
+    </a>
+    <a (click)="exportCurrentSlideAsImage('png')">
+      <i class="fas fa-file-image"></i> Slide actuelle (PNG)
+    </a>
+    <a (click)="exportCurrentSlideAsImage('jpeg')">
+      <i class="fas fa-file-image"></i> Slide actuelle (JPG)
+    </a>
+    <a (click)="exportAsPptx()">
+      <i class="fas fa-file-powerpoint"></i> Exporter en PowerPoint (Office 365)
+    </a>
+  </div>
+</div>
+
+
+    <button class="btn" (click)="toggleHistory()">📜 Historique</button>
+    <button class="btn btn-back" (click)="goBack()">← Retour</button>
+
+  </header>
+
+  <!-- Barre de personnalisation en haut -->
+  <div class="customization-bar">
+    <h3>🎨 Personnalisation</h3>
+    <label>Police :
+      <select [(ngModel)]="selectedFontFamily">
+          <option value="Arial">Arial</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Verdana">Verdana</option>
+      </select>
+    </label>
+
+    <label>Couleur titre :
+      <input type="color" [(ngModel)]="titleColor" />
+    </label>
+
+    <label>Couleur contenu :
+      <input type="color" [(ngModel)]="contentColor" />
+    </label>
+
+    <label>Taille titre :
+      <input type="number" [(ngModel)]="titleFontSize" min="10" max="72">
+    </label>
+    
+
+    <label>Taille contenu :
+      <input type="number" [(ngModel)]="contentFontSize" min="10" max="48">
+    </label>
+  </div>
+
+  <!-- Corps principal -->
+  <div class="editor-body">
+    <!-- Colonne gauche -->
+    <aside class="slide-list">
+      <div *ngFor="let slide of slides; let i = index"
+           (click)="selectSlide(i)"
+           [class.active]="i === currentSlide"
+           class="slide-item">
+        {{ i + 1 }}
+      </div>
+    </aside>
+
+    <!-- Éditeur -->
+<main class="slide-editor" [ngStyle]="templateStyles">
+  <!-- Titre de la slide -->
+  <!-- Titre de la slide -->
+<div class="title-preview"
+     [ngStyle]="{ 
+       'font-family': selectedFontFamily, 
+       'font-size': titleFontSize + 'px', 
+       'color': titleColor,
+       'margin': '10px 0', 
+       'font-weight': 'bold' 
+     }">
+  {{ slides[currentSlide]?.title || 'Titre de la slide' }}
+</div>
+
+<!-- Liste des points (éditables) -->
+<ul class="points-list">
+  <li *ngFor="let point of slides[currentSlide].content; let i = index">
+    <input
+    type="text"
+    [(ngModel)]="slides[currentSlide].content[i]"
+    class="point-input point-input-custom"
+    placeholder="Point clé"
+    [style.font-size.px]="contentFontSize"
+    [style.font-family]="selectedFontFamily"
+    [style.color]="contentColor"
+  />
+
+    <button (click)="removePoint(i)" class="btn-delete">×</button>
+  </li>
+</ul>
+
+
+<button (click)="addPoint()" class="btn">+ Ajouter un point</button>
+</main>
+
+<!-- Export PDF caché -->
+<div id="presentationToExport" style="position: absolute; left: -9999px; top: 0; width: 297mm; height: 210mm; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+  <div *ngFor="let slide of slides" class="slide-export-page" [ngStyle]="templateStyles">
+    <h2 [ngStyle]="{ 
+          'font-family': selectedFontFamily, 
+          'font-size': titleFontSize + 'px', 
+          'font-weight': 'bold', 
+          'color': titleColor,
+          'margin': '10px 0' 
+        }">
+      {{ slide.title }}
+    </h2>
+    <ul>
+      <li *ngFor="let point of slide.content" [ngStyle]="{ 
+            'font-family': selectedFontFamily, 
+            'font-size': contentFontSize + 'px',
+            'color': contentColor
+          }">
+        {{ point }}
+      </li>
+    </ul>
+  </div>
+</div>
+
+  <!-- Historique modal -->
+  <div class="modal" [class.show]="showHistory" (click)="toggleHistory()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>Historique des présentations sauvegardées</h3>
+      <button class="close-btn" (click)="toggleHistory()">×</button>
+      <ul>
+        <li *ngFor="let pres of history">
+          <strong>Présentation sauvegardée le :</strong>
+          {{ pres.savedAt | date:'short' }}
+          <button (click)="loadPresentation(pres.id)">Charger</button>
+          <button (click)="deletePresentation(pres.id)" class="btn-delete">🗑 Supprimer</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

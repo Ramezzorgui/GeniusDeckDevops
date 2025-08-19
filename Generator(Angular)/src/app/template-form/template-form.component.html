@@ -1,0 +1,43 @@
+<div class="dashboard-layout d-flex">
+ <sidebar></sidebar>
+<div class="main-card">
+  <div class="back-button-wrapper">
+  <button type="button" class="btn-back" (click)="goBack()">
+    <i class="material-icons me-1">arrow_back</i> Retour
+  </button>
+</div>
+
+  <h2>{{ isEdit ? 'Modifier' : 'Créer' }} un Template</h2>
+
+  <form (ngSubmit)="onSubmit()">
+    <label>Nom :</label>
+    <input [(ngModel)]="form.name" name="name" required #name="ngModel" />
+      <div *ngIf="name.invalid && name.touched" class="error">Le nom est obligatoire.</div>
+    <label>Catégorie :</label>
+    <input [(ngModel)]="form.category" name="category" required />
+    
+
+    <label>Structure :</label>
+<textarea
+  [(ngModel)]="form.structure"
+  name="structure"
+  rows="6"
+  placeholder='{
+  "sections": [
+    { "type": "title", "content": "Titre ici" },
+    { "type": "text", "content": "Texte ici" }
+  ]
+}'
+></textarea>
+
+    <label>Styles :</label>
+    <textarea [(ngModel)]="form.styles" name="styles"></textarea>
+
+    <label>
+      <input type="checkbox" [(ngModel)]="form.isPublic" name="isPublic" />
+      Public ?
+    </label>
+
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+  </form>
+</div>

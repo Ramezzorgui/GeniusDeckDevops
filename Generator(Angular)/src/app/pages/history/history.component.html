@@ -1,0 +1,28 @@
+<div class="dashboard-layout d-flex">
+  <sidebar></sidebar>
+
+  <div class="table-responsive" style="flex-grow: 1;">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Utilisateur</th>
+          <th>Date de sauvegarde</th>
+          <th>Nombre de slides</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pres of history">
+          <td>{{ pres.id }}</td>
+          <td>{{ pres.user }}</td>
+          <td>{{ pres.savedAt | date:'medium' }}</td>
+          <td>{{ pres.slides.length }}</td>
+          <td>
+            <button class="btn-edit" (click)="loadPresentation(pres.id)">Charger</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

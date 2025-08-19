@@ -1,0 +1,82 @@
+<!-- Interface d'authentification améliorée -->
+<div class="card card-container">
+  <img
+    id="profile-img"
+    src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
+    class="profile-img-card"
+    alt="Profile avatar"
+  />
+
+  <form
+    *ngIf="!isLoggedIn"
+    name="form"
+    (ngSubmit)="f.form.valid && onSubmit()"
+    #f="ngForm"
+    novalidate
+  >
+    <div class="form-group">
+      <label for="username">Email</label>
+      <div class="input-icon-wrapper">
+        <i class="fas fa-envelope"></i>
+        <input
+          type="text"
+          class="form-control"
+          name="username"
+          placeholder="Entrer votre email"
+          [(ngModel)]="form.username"
+          required
+          #username="ngModel"
+          [ngClass]="{ 'is-invalid': f.submitted && username.errors }"
+        />
+      </div>
+      <div *ngIf="username.errors && f.submitted" class="invalid-feedback">
+        L'email est requis !
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Mot de passe</label>
+      <div class="input-icon-wrapper">
+        <i class="fas fa-lock"></i>
+        <input
+          type="password"
+          class="form-control"
+          name="password"
+          placeholder="Entrer votre mot de passe"
+          [(ngModel)]="form.password"
+          required
+          minlength="6"
+          #password="ngModel"
+          [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
+        />
+      </div>
+      <div *ngIf="password.errors && f.submitted" class="invalid-feedback">
+        <div *ngIf="password.errors['required']">Mot de passe requis</div>
+        <div *ngIf="password.errors['minlength']">
+          Minimum 6 caractères
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <button class="btn btn-primary btn-block">Connexion</button>
+    </div>
+
+    <div class="form-group text-right mb-3">
+      <a routerLink="/forgot-password">Mot de passe oublié ?</a>
+    </div>
+
+    <div class="form-group">
+      <div *ngIf="f.submitted && isLoginFailed" class="alert alert-danger" role="alert">
+        Échec de connexion : {{ errorMessage }}
+      </div>
+    </div>
+  </form>
+
+  <div class="alert alert-success" *ngIf="isLoggedIn">
+    Connecté en tant que {{ roles }}.
+  </div>
+</div>
+
+<!-- Ajoutez cette icône dans le <head> si ce n'est pas déjà fait -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
