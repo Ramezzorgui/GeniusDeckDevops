@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    image: geniusdeck-backend:latest
+    container_name: geniusdeck-backend
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/presentation
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=ramezrammeh
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  frontend:
+    image: geniusdeck-frontend:latest
+    container_name: geniusdeck-frontend
+    ports:
+      - "4300:80"
+    restart: unless-stopped
+
+  db:
+    image: postgres:15
+    container_name: geniusdeck-postgres
+    environment:
+      POSTGRES_DB: presentation
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ramezrammeh
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  pgdata:
