@@ -14,15 +14,15 @@ pipeline {
             }
         }
 
-        sstage('Build Backend') {
-    steps {
-        echo "Building Spring Boot backend..."
-        dir('generator') {
-            sh 'chmod +x mvnw'              // rend mvnw exécutable
-            sh './mvnw clean package -DskipTests'
+        stage('Build Backend') {
+            steps {
+                echo "Building Spring Boot backend..."
+                dir('generator') {
+                    sh 'chmod +x mvnw'              // rend mvnw exécutable
+                    sh './mvnw clean package -DskipTests'
+                }
+            }
         }
-    }
-}
 
 
 
