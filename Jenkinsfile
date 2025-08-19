@@ -17,10 +17,10 @@ pipeline {
         stage('Build Backend') {
             steps {
                 echo "Building Spring Boot backend..."
-                dir('Generator') {
-                    sh 'chmod +x mvnw'        // s’assure que le wrapper Maven est exécutable
-                    sh './mvnw clean package -DskipTests'
-                }
+                   dir('Generator') {
+                        sh 'mvn clean package -DskipTests'
+                    }
+
             }
         }
 
