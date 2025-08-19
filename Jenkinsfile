@@ -29,7 +29,7 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 echo "Building Angular frontend..."
-                dir('Generator(Angular)') {
+                dir('Generator-angular') {
                     sh 'npm install --legacy-peer-deps'
                     sh 'npm run build -- --output-path=dist'
                 }
