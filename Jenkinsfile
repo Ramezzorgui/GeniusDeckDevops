@@ -15,14 +15,14 @@ pipeline {
         }
 
         stage('Build Backend') {
-            steps {
-                echo "Building Spring Boot backend..."
-                   dir('Generator') {
-                        sh 'mvn clean package -DskipTests'
-                    }
-
-            }
+    steps {
+        echo "Building Spring Boot backend..."
+        dir('generator') {
+            sh './mvnw clean package -DskipTests'
         }
+    }
+}
+
 
         stage('Build Frontend') {
             steps {
