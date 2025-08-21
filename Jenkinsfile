@@ -18,7 +18,7 @@ pipeline {
             steps {
                 echo "Building Spring Boot backend..."
                 dir('generator') {
-                    sh 'chmod +x mvnw'              // rend mvnw exécutable
+                    sh 'chmod +x mvnw'              
                     sh './mvnw clean package -DskipTests'
                 }
             }
@@ -37,24 +37,25 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    def startTime = System.currentTimeMillis()
-                    try {
-                        withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-                            withSonarQubeEnv('SonarQube') {
-                                sh """
-                                    ./generator/mvnw sonar:sonar \
-                                      -f generator/pom.xml \
-                                      -Dsonar.projectKey=geniusdeck-backend \
-                                      -Dsonar.host.url=$SONAR_HOST_URL \
-                                      -Dsonar.login=$SONAR_TOKEN
-                                """
-                            }
+                    withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                        withSonarQubeEnv('SonarQube') {
+                            sh """
+                                ./generator/mvnw sonar:sonar \
+                                  -f generator/pom.xml \
+                                  -Dsonar.projectKey=geniusdeck-backend \
+                                  -Dsonar.host.url=$SONAR_HOST_URL \
+                                  -Dsonar.login=$SONAR_TOKEN
+                            """
                         }
-                    } finally {
-                        def endTime = System.currentTimeMillis()
-                        def duration = (endTime - startTime) / 1000
-                        echo "Durée de l'étape SonarQube Analysis : ${duration}s"
                     }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
