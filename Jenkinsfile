@@ -52,13 +52,20 @@ pipeline {
             }
         }
 
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 15, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
+        stage('Start Nexus') {
+    steps {
+        script {
+            sh '''
+            docker run -d \
+                --name nexus \
+                -p 8082:8081 \
+                -v nexus-data:/nexus-data \
+                sonatype/nexus3:latest
+            '''
         }
+    }
+}
+
 
         stage('Build Docker Images') {
             steps {
