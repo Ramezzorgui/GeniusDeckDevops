@@ -82,6 +82,25 @@ pipeline {
             }
         }
 
+        stage('Publish Backend Artifact to Nexus') {
+            steps {
+                echo "Publishing backend JAR to Nexus repository..."
+                dir('generator') {
+                    withCredentials([usernamePassword(credentialsId: 'nexus', 
+                                                     usernameVariable: 'NEXUS_USER', 
+                                                     passwordVariable: 'NEXUS_PASSWORD')]) {
+                        sh """
+                            ./mvnw deploy -DskipTests \
+                                -Dnexus.username=$NEXUS_USER \
+                                -Dnexus.password=$NEXUS_PASSWORD \
+                                -DaltDeploymentRepository=nexus::default::http://192.168.33.10:8082/repository/maven-releases/
+                        """
+                    }
+                }
+            }
+        }
+
+
 
 
         stage('Build Docker Images') {
