@@ -24,6 +24,19 @@ pipeline {
             }
         }
 
+
+        stage('Run Backend Tests') {
+            steps {
+                echo "Running backend JUnit tests..."
+                dir('generator') {
+                    sh './mvnw test'
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+
+
         stage('Build Frontend') {
             steps {
                 echo "Building Angular frontend..."
