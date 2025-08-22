@@ -53,18 +53,22 @@ pipeline {
         }
 
         stage('Start Nexus') {
-    steps {
-        script {
-            sh '''
-            docker run -d \
-                --name nexus \
-                -p 8082:8081 \
-                -v nexus-data:/nexus-data \
-                sonatype/nexus3:latest
-            '''
+            steps {
+                script {
+                    // Vérifie si le conteneur existe déjà
+                    def containerExists = sh(script: "docker ps -a -q -f name=nexus", returnStdout: true).trim()
+                    
+                    if (containerExists) {
+                        echo "Le conteneur Nexus existe déjà, on le démarre si nécessaire..."
+                        sh "docker start nexus || true"
+                    } else {
+                        echo "Le conteneur Nexus n'existe pas, on le crée..."
+                        sh "docker run -d --name nexus -p 8082:8081 -v nexus-data:/nexus-data sonatype/nexus3:latest"
+                    }
+                }
+            }
         }
-    }
-}
+
 
 
         stage('Build Docker Images') {
