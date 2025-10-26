@@ -4,6 +4,9 @@ pipeline {
     environment {
         BACKEND_IMAGE = "geniusdeck-backend:latest"
         FRONTEND_IMAGE = "geniusdeck-frontend:latest"
+        NEXUS_URL = "192.168.33.10:8085"    
+        NEXUS_REPO = "GeniusDeck"            
+        NEXUS_CREDENTIAL_ID = "nexus"
     }
 
     stages {
@@ -24,7 +27,6 @@ pipeline {
             }
         }
 
-
         stage('Run Backend Tests') {
             steps {
                 echo "Running backend JUnit tests..."
@@ -34,8 +36,6 @@ pipeline {
                 }
             }
         }
-
-
 
         stage('Build Frontend') {
             steps {
@@ -65,56 +65,37 @@ pipeline {
             }
         }
 
-        stage('Start Nexus') {
-            steps {
-                script {
-                    // Vérifie si le conteneur existe déjà
-                    def containerExists = sh(script: "docker ps -a -q -f name=nexus", returnStdout: true).trim()
-                    
-                    if (containerExists) {
-                        echo "Le conteneur Nexus existe déjà, on le démarre si nécessaire..."
-                        sh "docker start nexus || true"
-                    } else {
-                        echo "Le conteneur Nexus n'existe pas, on le crée..."
-                        sh "docker run -d --name nexus -p 8082:8081 -v nexus-data:/nexus-data sonatype/nexus3:latest"
-                    }
-                }
-            }
-        }
-
-        stage('Publish Backend Artifact to Nexus') {
-            steps {
-                echo "Publishing backend JAR to Nexus repository..."
-                dir('generator') {
-                    withCredentials([usernamePassword(credentialsId: 'nexus', 
-                                                     usernameVariable: 'NEXUS_USER', 
-                                                     passwordVariable: 'NEXUS_PASSWORD')]) {
-                        sh """
-                            ./mvnw deploy -DskipTests \
-                                -Dnexus.username=$NEXUS_USER \
-                                -Dnexus.password=$NEXUS_PASSWORD \
-                                -DaltDeploymentRepository=nexus::default::http://192.168.33.10:8082/repository/maven-releases/
-                        """
-                    }
-                }
-            }
-        }
-
-
-
-
         stage('Build Docker Images') {
             steps {
                 echo "Building Docker images..."
-                sh "docker build -t ${BACKEND_IMAGE} ./generator"
-                sh "docker build -t ${FRONTEND_IMAGE} ./Generator-Angular"
+                sh "docker build -t geniusdeck-backend ./generator"
+                sh "docker build -t geniusdeck-frontend ./Generator-Angular"
+            }
+        }
+
+        stage('Push Docker Images to Nexus') {
+            steps {
+                echo "Pushing Docker images to Nexus Repository..."
+                withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIAL_ID}", usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                    sh """
+                        echo "$NEXUS_PASS" | docker login ${NEXUS_URL} -u "$NEXUS_USER" --password-stdin
+
+                        docker tag geniusdeck-backend ${NEXUS_URL}/geniusdeck-backend:latest
+                        docker tag geniusdeck-frontend ${NEXUS_URL}/geniusdeck-frontend:latest
+
+                        docker push ${NEXUS_URL}/geniusdeck-backend:latest
+                        docker push ${NEXUS_URL}/geniusdeck-frontend:latest
+
+                        docker logout ${NEXUS_URL}
+                    """
+                }
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
                 echo "Deploying with docker-compose..."
-                sh "docker-compose down"
+                sh "docker-compose down || true"
                 sh "docker-compose up -d"
             }
         }
